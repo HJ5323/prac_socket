@@ -26,7 +26,7 @@ public class Server
         // 데이터베이스 서버 연결
         try
         {
-            string connStr = "Server = 127.0.0.1; Database=bluff_city; Uid=bluff_city; Pwd=bluff_city;";
+            string connStr = "Server=127.0.0.1;Database=bluff_city;Uid=bluff_city;Pwd=bluff_city;";
             conn = new MySqlConnection(connStr);
             conn.Open();
             MySqlCommand cmd = new MySqlCommand("set names euckr", conn);

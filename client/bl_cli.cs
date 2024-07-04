@@ -8,8 +8,6 @@ using MySql.Data.MySqlClient;
 class Program
 {
     private const int MaxSize = 1024;
-    private const int Enter = 13;
-    private const int BackSpace = 8;
     private static Socket clientSocket;
     private static string myId;
     private static MySqlConnection conn;
@@ -19,7 +17,7 @@ class Program
         // 데이터베이스 서버 연결
         try
         {
-            string connStr = "Server = 127.0.0.1; Database=bluff_city; Uid=bluff_city; Pwd=bluff_city;";
+            string connStr = "Server=127.0.0.1;Database=bluff_city;Uid=bluff_city;Pwd=bluff_city;";
             conn = new MySqlConnection(connStr);
             conn.Open();
             MySqlCommand cmd = new MySqlCommand("set names euckr", conn);
@@ -192,7 +190,7 @@ class Program
             Console.Write("닉네임을 입력하세요: ");
             name = Console.ReadLine();
             if (!NameCheck(name)) break;
-            Console.WriteLine("이미 존재하는 아이디입니다.");
+            Console.WriteLine("이미 존재하는 닉네임입니다.");
         }
 
         string query = "INSERT INTO user(ID, PW, NICKNAME) VALUES(@ID, @PW, @NICKNAME)";
@@ -208,23 +206,26 @@ class Program
     // 채팅 내역 불러오기
     static void ChatHistory()
     {
-        string query = "SELECT * FROM mafia_chats";
-        MySqlCommand cmd = new MySqlCommand(query, conn);
-        MySqlDataReader rdr = cmd.ExecuteReader();
-
-        while (rdr.Read())
+        try
         {
-            string from = rdr.GetString(1);
-            string to = rdr.GetString(2);
-            string msg = rdr.GetString(3);
+            string query = "SELECT nickname, mafia_chat FROM mafia_chats";
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            MySqlDataReader rdr = cmd.ExecuteReader();
 
-            if (string.IsNullOrEmpty(to))
+            while (rdr.Read())
+            {
+                string from = rdr.GetString(0);    // nickname 열
+                string msg = rdr.GetString(1);     // mafia_chat 열
+
                 Console.WriteLine($"{from} : {msg}");
-            else
-                Console.WriteLine($"{from}({to}) : {msg}");
-        }
+            }
 
-        rdr.Close();
+            rdr.Close();
+        }
+        catch (MySqlException ex)
+        {
+            Console.WriteLine("Database Error: " + ex.Message);
+        }
     }
 
     // 서버로부터 받은 메세지 출력
@@ -260,5 +261,4 @@ class Program
         }
     }
 }
-
 
